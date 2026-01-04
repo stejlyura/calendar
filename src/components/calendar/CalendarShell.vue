@@ -8,12 +8,12 @@ import interactionPlugin from '@fullcalendar/interaction'
 import type {
   CalendarOptions,
   DatesSetArg,
-  DateClickArg,
   EventClickArg,
   EventChangeArg,
   EventApi,
   DateSelectArg,
 } from '@fullcalendar/core'
+import type { DateClickArg } from '@fullcalendar/interaction'
 
 type CalendarEvent = {
   id: string
@@ -37,7 +37,8 @@ const viewButtons = [
   { id: 'listWeek', label: 'Agenda' },
 ]
 
-const colorOptions = ['#3d7bfd', '#20c997', '#ff8a65', '#6f52ff', '#f4b23f']
+const defaultColor = '#3d7bfd'
+const colorOptions = [defaultColor, '#20c997', '#ff8a65', '#6f52ff', '#f4b23f']
 const storageKey = 'calendar-events'
 const createId = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -75,7 +76,7 @@ const formState = reactive({
   date: '',
   startTime: '',
   endTime: '',
-  color: colorOptions[0],
+  color: defaultColor,
 })
 
 const options = reactive<CalendarOptions>({
@@ -138,7 +139,7 @@ const openCreateModal = (date: Date, end?: Date) => {
   formState.date = formatDateInput(baseDate)
   formState.startTime = formatTimeInput(baseDate)
   formState.endTime = formatTimeInput(computedEnd)
-  formState.color = colorOptions[0]
+  formState.color = defaultColor
   editingId.value = null
   formError.value = ''
   isModalOpen.value = true
@@ -151,7 +152,7 @@ const openEditModal = (event: EventApi) => {
   formState.date = formatDateInput(start)
   formState.startTime = formatTimeInput(start)
   formState.endTime = formatTimeInput(end)
-  formState.color = event.backgroundColor || event.borderColor || colorOptions[0]
+  formState.color = event.backgroundColor || event.borderColor || defaultColor
   editingId.value = event.id ?? null
   formError.value = ''
   isModalOpen.value = true
