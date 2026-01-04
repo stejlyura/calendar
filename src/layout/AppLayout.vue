@@ -1,45 +1,58 @@
 <script setup lang="ts">
-const navItems = [
-  'Home',
-  'Dashboard',
-  'Inbox',
-  'Products',
-  'Invoices',
-  'Customers',
-  'Chat Room',
-  'Calendar',
-  'Help Center',
-  'Settings',
-]
+import { ref } from 'vue'
+import SidebarNav from '../components/sidebar/SidebarNav.vue'
+
+const isSidebarOpen = ref(false)
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+
+const handleSidebarSelect = () => {
+  isSidebarOpen.value = false
+}
 </script>
 
 <template>
   <div class="app-shell">
-    <aside class="sidebar">
-      <div class="sidebar__brand">IMPEKABLE</div>
-      <nav class="sidebar__nav">
-        <button
-          v-for="item in navItems"
-          :key="item"
-          class="sidebar__item"
-          :class="{ 'is-active': item === 'Calendar' }"
-          type="button"
-        >
-          <span class="sidebar__dot" aria-hidden="true"></span>
-          <span>{{ item }}</span>
-        </button>
-      </nav>
-    </aside>
+    <SidebarNav
+      :class="{ 'is-open': isSidebarOpen }"
+      @select="handleSidebarSelect"
+    />
+    <button
+      class="sidebar-backdrop"
+      :class="{ 'is-visible': isSidebarOpen }"
+      type="button"
+      aria-label="Close menu"
+      @click="isSidebarOpen = false"
+    ></button>
 
     <div class="app-main">
       <header class="topbar">
-        <div class="topbar__search">
-          <span class="topbar__search-icon" aria-hidden="true"></span>
-          <input
-            class="topbar__input"
-            type="text"
-            placeholder="Search transactions, invoices or help"
-          />
+        <div class="topbar__left">
+          <button
+            class="topbar__menu"
+            :class="{ 'is-open': isSidebarOpen }"
+            type="button"
+            aria-label="Toggle menu"
+            aria-controls="sidebar-nav"
+            :aria-expanded="isSidebarOpen"
+            @click="toggleSidebar"
+          >
+            <span class="burger" aria-hidden="true">
+              <span class="burger__line"></span>
+              <span class="burger__line"></span>
+              <span class="burger__line"></span>
+            </span>
+          </button>
+          <div class="topbar__search">
+            <span class="topbar__search-icon" aria-hidden="true"></span>
+            <input
+              class="topbar__input"
+              type="text"
+              placeholder="Search transactions, invoices or help"
+            />
+          </div>
         </div>
         <div class="topbar__actions">
           <button class="topbar__icon-btn" type="button" aria-label="Notifications">
@@ -69,70 +82,6 @@ const navItems = [
   min-height: 100vh;
 }
 
-.sidebar {
-  background: var(--sidebar-bg);
-  color: var(--sidebar-text);
-  padding: 24px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.sidebar__brand {
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  font-size: 14px;
-  color: #f3f3ff;
-}
-
-.sidebar__nav {
-  display: grid;
-  gap: 6px;
-}
-
-.sidebar__item {
-  background: transparent;
-  border: none;
-  color: inherit;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.sidebar__item.is-active {
-  color: var(--sidebar-active);
-  background: rgba(255, 255, 255, 0.08);
-  position: relative;
-}
-
-.sidebar__item:hover {
-  color: var(--sidebar-active);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.sidebar__item.is-active::before {
-  content: '';
-  position: absolute;
-  left: -20px;
-  top: 12px;
-  bottom: 12px;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--brand);
-}
-
-.sidebar__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.6;
-}
-
 .app-main {
   display: flex;
   flex-direction: column;
@@ -149,6 +98,52 @@ const navItems = [
   gap: 16px;
 }
 
+.topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.topbar__menu {
+  border: none;
+  background: #f5f6fb;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: none;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.burger {
+  width: 18px;
+  height: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.burger__line {
+  height: 2px;
+  border-radius: 2px;
+  background: #68708f;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.topbar__menu.is-open .burger__line:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.topbar__menu.is-open .burger__line:nth-child(2) {
+  opacity: 0;
+}
+
+.topbar__menu.is-open .burger__line:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
 .topbar__search {
   display: flex;
   align-items: center;
@@ -157,6 +152,7 @@ const navItems = [
   border-radius: 18px;
   padding: 8px 14px;
   min-width: 280px;
+  flex: 1;
 }
 
 .topbar__search-icon {
@@ -267,19 +263,46 @@ const navItems = [
   padding: 28px 32px 40px;
 }
 
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 980px) {
   .app-shell {
     grid-template-columns: 1fr;
   }
 
-  .sidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
   .topbar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .topbar__menu {
+    display: grid;
+  }
+
+  .topbar__search {
+    min-width: 0;
+  }
+
+  .topbar__actions {
+    justify-content: space-between;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 18, 37, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 15;
+  }
+
+  .sidebar-backdrop.is-visible {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 </style>
