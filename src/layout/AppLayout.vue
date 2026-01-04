@@ -109,6 +109,11 @@ const navItems = [
   position: relative;
 }
 
+.sidebar__item:hover {
+  color: var(--sidebar-active);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .sidebar__item.is-active::before {
   content: '';
   position: absolute;

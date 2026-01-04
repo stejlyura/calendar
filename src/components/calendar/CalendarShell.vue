@@ -345,7 +345,7 @@ watch(
   border-radius: 14px;
   padding: 18px 18px 8px;
   box-shadow: var(--shadow);
-  max-width: 980px;
+  max-width: 1240px;
   width: 100%;
 }
 
